@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Standby Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="./css/core.css">
+  <link rel="icon" type="image/x-icon" href="ico/standby-noir.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="ico/standby-noir.ico" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+</head>
+<body>
+  <div id="app" class="app">
+    <div id="stage-shell" class="stage-shell">
+      <div id="burnin-layer" class="burnin-layer">
+        <div id="design-host" class="design-host" aria-live="off"></div>
+      </div>
+    </div>
+
+    <div id="rotate-overlay" class="overlay rotate-overlay" aria-hidden="true">
+      <div class="overlay-card">
+        <div class="rotate-iphone">
+          <div class="rotate-phone"></div>
+          <div class="rotate-arrow">↻</div>
+        </div>
+        <div class="overlay-title">Rotate iPhone</div>
+        <div class="overlay-subtitle">StandBy looks best in landscape.</div>
+      </div>
+    </div>
+
+    <div id="sleep-overlay" class="overlay sleep-overlay" aria-hidden="true">
+      <div class="sleep-hint">Tap to wake</div>
+    </div>
+
+    <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+      <div class="settings-backdrop" data-action="close-settings"></div>
+      <aside class="settings-panel" role="dialog" aria-modal="true" aria-label="Standby settings">
+        <header class="settings-header">
+          <div>
+            <div class="settings-kicker">Standby Suite</div>
+            <h1>Settings</h1>
+          </div>
+          <button class="settings-close" data-action="close-settings" aria-label="Close settings">Done</button>
+        </header>
+
+        <div class="settings-body">
+          <section class="settings-section">
+            <h2>Design</h2>
+            <div class="settings-grid">
+              <label class="field">
+                <span>Design</span>
+                <select id="field-designId"></select>
+              </label>
+
+              <label class="field">
+                <span>Style</span>
+                <select id="field-styleId"></select>
+              </label>
+            </div>
+            <div id="design-source" class="meta-line"></div>
+          </section>
+
+          <section class="settings-section">
+            <h2>Display</h2>
+            <div class="settings-grid">
+              <label class="field">
+                <span>Turn off time</span>
+                <select id="field-turnOffMinutes">
+                  <option value="0">Never</option>
+                  <option value="10">10 minutes</option>
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                  <option value="120">120 minutes</option>
+                </select>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-fullScreen" type="checkbox">
+                <span>Fullscreen</span>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-wakeLockEnabled" type="checkbox">
+                <span>Keep screen awake when possible</span>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-use24Hour" type="checkbox">
+                <span>24-hour time</span>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-showSeconds" type="checkbox">
+                <span>Show seconds</span>
+              </label>
+
+              <label class="field">
+                <span>Brightness</span>
+                <input id="field-brightness" type="range" min="0.35" max="1" step="0.01">
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h2>Anti burn-in</h2>
+            <div class="settings-grid">
+              <label class="field checkbox-field">
+                <input id="field-antiBurnInPixelShift" type="checkbox">
+                <span>Pixel shift</span>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-antiBurnInDrift" type="checkbox">
+                <span>Slow drift</span>
+              </label>
+
+              <label class="field checkbox-field">
+                <input id="field-antiBurnInDimPulse" type="checkbox">
+                <span>Dim pulse</span>
+              </label>
+
+              <label class="field">
+                <span>Shift amount</span>
+                <input id="field-shiftAmount" type="range" min="2" max="18" step="1">
+              </label>
+
+              <label class="field">
+                <span>Shift every</span>
+                <select id="field-shiftIntervalSec">
+                  <option value="30">30 sec</option>
+                  <option value="45">45 sec</option>
+                  <option value="60">60 sec</option>
+                  <option value="90">90 sec</option>
+                  <option value="120">120 sec</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h2>Common data</h2>
+            <div class="settings-grid">
+              <label class="field">
+                <span>Alarm label</span>
+                <input id="field-alarmText" type="text" placeholder="8:30 AM">
+              </label>
+
+              <label class="field">
+                <span>Travel time label</span>
+                <input id="field-travelTimeText" type="text" placeholder="12:17">
+              </label>
+
+              <label class="field">
+                <span>Accent color</span>
+                <input id="field-accentColor" type="color">
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h2>Design options</h2>
+            <div id="dynamic-design-fields" class="settings-grid"></div>
+          </section>
+
+          <section class="settings-section">
+            <h2>Loaded scripts</h2>
+            <div id="loaded-designs" class="loaded-designs"></div>
+          </section>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="./js/core.js"></script>
+  <script src="./designs/vanilla.js"></script>
+  <script src="./designs/neon.js"></script>
+  <script src="./designs/retro-sevenseg.js"></script>
+</body>
+</html>

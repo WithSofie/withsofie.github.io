@@ -1,0 +1,181 @@
+
+.neon-design {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05070f;
+  color: #fff;
+  --neon-glow: 0.8;
+}
+
+.neon-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 260ms ease, visibility 260ms ease;
+}
+
+.neon-design[data-style="0"] .neon-scene--aura,
+.neon-design[data-style="1"] .neon-scene--split {
+  opacity: 1;
+  visibility: visible;
+}
+
+.neon-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.neon-star {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.82);
+  animation: neonTwinkle 7s ease-in-out infinite;
+}
+
+@keyframes neonTwinkle {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.6); }
+}
+
+.neon-aura {
+  position: absolute;
+  width: 42vw;
+  height: 42vw;
+  border-radius: 50%;
+  filter: blur(55px);
+  opacity: calc(0.65 * var(--neon-glow));
+}
+
+.neon-aura--left {
+  left: -4vw;
+  top: 18vh;
+  background: rgba(125, 92, 255, 0.62);
+}
+
+.neon-aura--right {
+  right: -8vw;
+  bottom: 8vh;
+  background: rgba(63, 185, 255, 0.58);
+}
+
+.neon-main {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--safe-top) + 1rem) calc(var(--safe-right) + 2rem) calc(var(--safe-bottom) + 1rem) calc(var(--safe-left) + 2rem);
+}
+
+.neon-date {
+  position: absolute;
+  top: calc(var(--safe-top) + 1.3rem);
+  left: calc(var(--safe-left) + 1.8rem);
+  font-size: clamp(1.1rem, 2vw, 1.7rem);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+
+.neon-time {
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  white-space: nowrap;
+}
+
+.neon-time--hero {
+  font-size: clamp(9rem, 22vw, 18rem);
+  color: #d8e7ff;
+  text-shadow:
+    0 0 calc(0.35rem * var(--neon-glow)) rgba(166, 188, 255, 0.9),
+    0 0 calc(1.8rem * var(--neon-glow)) rgba(87, 155, 255, 0.55),
+    0 0 calc(4.4rem * var(--neon-glow)) rgba(106, 91, 255, 0.28);
+}
+
+.neon-scene--split {
+  background:
+    radial-gradient(45rem 32rem at 16% 10%, rgba(119, 93, 255, 0.18), transparent 60%),
+    radial-gradient(42rem 28rem at 100% 100%, rgba(52, 186, 255, 0.16), transparent 55%),
+    #03060d;
+  padding: calc(var(--safe-top) + 1.2rem) calc(var(--safe-right) + 1.6rem) calc(var(--safe-bottom) + 1.2rem) calc(var(--safe-left) + 1.6rem);
+}
+
+.neon-grid-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+  mask-image: linear-gradient(to bottom, transparent 0, rgba(0,0,0,0.8) 18%, rgba(0,0,0,0.95));
+}
+
+.neon-card {
+  position: absolute;
+  border-radius: 1.8rem;
+  background: rgba(14, 18, 31, 0.54);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 70px rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+}
+
+.neon-card--time {
+  left: calc(var(--safe-left) + 1.2rem);
+  top: calc(var(--safe-top) + 1.2rem);
+  right: 34vw;
+  bottom: calc(var(--safe-bottom) + 1.2rem);
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.neon-card--meta {
+  top: calc(var(--safe-top) + 1.2rem);
+  right: calc(var(--safe-right) + 1.2rem);
+  width: min(30vw, 20rem);
+  bottom: calc(var(--safe-bottom) + 1.2rem);
+  padding: 1.3rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.neon-card-label {
+  font-size: .82rem;
+  letter-spacing: .24em;
+  color: rgba(255,255,255,0.5);
+}
+
+.neon-time--split {
+  font-size: clamp(8rem, 20vw, 17rem);
+  color: #eaf1ff;
+  text-shadow:
+    0 0 calc(0.26rem * var(--neon-glow)) rgba(217, 230, 255, 0.95),
+    0 0 calc(1.4rem * var(--neon-glow)) rgba(108, 162, 255, 0.52);
+}
+
+.neon-next-alarm {
+  margin-top: auto;
+  font-size: clamp(2rem, 4.6vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.neon-small-date {
+  font-size: clamp(1rem, 2vw, 1.45rem);
+  color: rgba(255,255,255,0.68);
+}
+
+@media (max-width: 900px) {
+  .neon-card--time {
+    right: 38vw;
+  }
+
+  .neon-card--meta {
+    width: 34vw;
+  }
+}

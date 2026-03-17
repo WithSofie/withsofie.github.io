@@ -1,0 +1,369 @@
+
+.vanilla-design {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  --vanilla-accent: #ff453a;
+  --vanilla-blue-strength: 1;
+  --vanilla-pastel-tilt: 6deg;
+}
+
+.vanilla-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 260ms ease, visibility 260ms ease;
+}
+
+.vanilla-design[data-style="0"] .vanilla-scene--pastel,
+.vanilla-design[data-style="1"] .vanilla-scene--night,
+.vanilla-design[data-style="2"] .vanilla-scene--map,
+.vanilla-design[data-style="3"] .vanilla-scene--analog {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.vanilla-scene--pastel {
+  background:
+    linear-gradient(var(--vanilla-pastel-tilt), rgba(193, 155, 167, 0.94), rgba(154, 183, 217, 0.94));
+}
+
+.vanilla-pastel-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(50rem 24rem at 50% 48%, rgba(176, 205, 242, 0.22), transparent 62%),
+    radial-gradient(44rem 20rem at 32% 42%, rgba(228, 187, 224, 0.18), transparent 60%);
+  filter: blur(10px);
+}
+
+.vanilla-pastel-clock,
+.vanilla-night-main {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--safe-top) + 1.2rem) calc(var(--safe-right) + 2.2rem) calc(var(--safe-bottom) + 1.2rem) calc(var(--safe-left) + 2.2rem);
+}
+
+.vanilla-time {
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+  white-space: nowrap;
+}
+
+.vanilla-time--pastel {
+  font-weight: 700;
+  font-size: clamp(9rem, 22vw, 19rem);
+  background: linear-gradient(90deg, rgba(237, 207, 242, 0.92), rgba(189, 214, 255, 0.96), rgba(144, 217, 252, 0.92));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.96;
+}
+
+.vanilla-scene--night {
+  background: #000;
+}
+
+.vanilla-time--night {
+  font-weight: 700;
+  font-size: clamp(10rem, 25vw, 22rem);
+  color: color-mix(in srgb, #7fb2ff calc(88% * var(--vanilla-blue-strength)), white 12%);
+}
+
+.vanilla-night-side {
+  position: absolute;
+  top: calc(var(--safe-top) + 1.4rem);
+  right: calc(var(--safe-right) + 2rem);
+  bottom: calc(var(--safe-bottom) + 1.8rem);
+  width: min(20vw, 14rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.vanilla-side-day {
+  font-size: clamp(1.4rem, 3.2vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: #76a8ff;
+  white-space: nowrap;
+}
+
+.vanilla-side-alarm {
+  display: grid;
+  gap: .35rem;
+  align-items: center;
+  justify-items: start;
+}
+
+.vanilla-alarm-glyph {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1;
+  color: #76a8ff;
+}
+
+.vanilla-alarm-text {
+  font-size: clamp(2rem, 4.2vw, 4.3rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.vanilla-scene--map {
+  background: #000;
+}
+
+.vanilla-map-top {
+  position: absolute;
+  top: calc(var(--safe-top) + 1rem);
+  left: calc(var(--safe-left) + 1.6rem);
+  z-index: 2;
+}
+
+.vanilla-map-alarm {
+  font-size: clamp(1.35rem, 3vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.vanilla-map-wrap {
+  position: absolute;
+  inset: 0;
+  padding: calc(var(--safe-top) + 1.4rem) calc(var(--safe-right) + 1.4rem) calc(var(--safe-bottom) + 1rem) calc(var(--safe-left) + 1.2rem);
+}
+
+.vanilla-map-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.vanilla-map-window {
+  fill: none;
+  stroke: rgba(255,255,255,0.42);
+  stroke-width: 6;
+}
+
+.vanilla-map-dot {
+  fill: rgba(255,255,255,0.28);
+}
+
+.vanilla-map-dot--bright {
+  fill: rgba(255,255,255,0.88);
+}
+
+.vanilla-map-hotspot-shadow {
+  fill: rgba(255, 159, 10, 0.25);
+}
+
+.vanilla-map-hotspot {
+  fill: #ff9f0a;
+}
+
+.vanilla-map-bottom {
+  position: absolute;
+  left: calc(var(--safe-left) + 1.6rem);
+  bottom: calc(var(--safe-bottom) + 1.2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .4rem;
+  z-index: 2;
+}
+
+.vanilla-map-arrow {
+  font-size: clamp(1.6rem, 3vw, 2.8rem);
+  line-height: 1;
+  color: #ff9f0a;
+  transform: rotate(-38deg);
+  transform-origin: center center;
+}
+
+.vanilla-map-travel {
+  font-size: clamp(5.2rem, 12vw, 8.8rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.vanilla-scene--analog {
+  display: grid;
+  grid-template-columns: minmax(0, 0.54fr) minmax(0, 0.46fr);
+  align-items: center;
+  gap: 2rem;
+  padding: calc(var(--safe-top) + 1rem) calc(var(--safe-right) + 1.8rem) calc(var(--safe-bottom) + 1rem) calc(var(--safe-left) + 1.8rem);
+  background: #000;
+}
+
+.vanilla-analog-panel {
+  display: grid;
+  place-items: center;
+}
+
+.vanilla-analog-face {
+  position: relative;
+  width: min(44vw, 31rem);
+  height: min(44vw, 31rem);
+  border-radius: 50%;
+}
+
+.vanilla-analog-marks {
+  position: absolute;
+  inset: 0;
+}
+
+.vanilla-analog-mark {
+  position: absolute;
+  left: 50%;
+  top: 1.2%;
+  width: 0.38rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.28);
+}
+
+.vanilla-analog-mark--major {
+  background: rgba(255,255,255,0.96);
+  height: 1.9rem;
+}
+
+.vanilla-analog-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.8rem;
+  height: 1.8rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 .45rem #ff9f0a inset;
+}
+
+.vanilla-analog-hand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: 50% 100%;
+  border-radius: 999px;
+}
+
+.vanilla-analog-hand--hour {
+  width: 1rem;
+  height: 8.5rem;
+  margin-left: -.5rem;
+  margin-top: -8.5rem;
+  background: #f4f4f7;
+}
+
+.vanilla-analog-hand--minute {
+  width: .95rem;
+  height: 12.4rem;
+  margin-left: -.475rem;
+  margin-top: -12.4rem;
+  background: #f4f4f7;
+}
+
+.vanilla-analog-hand--second {
+  width: .26rem;
+  height: 13.8rem;
+  margin-left: -.13rem;
+  margin-top: -13.8rem;
+  background: #ff9f0a;
+}
+
+.vanilla-calendar-panel {
+  position: relative;
+  padding-right: .8rem;
+}
+
+.vanilla-charge-ring {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(10vw, 6rem);
+  height: min(10vw, 6rem);
+  border-radius: 50%;
+  border: .8rem solid #30d158;
+  border-left-color: rgba(48, 209, 88, 0.16);
+  display: grid;
+  place-items: center;
+  color: #30d158;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.vanilla-calendar-month {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  color: var(--vanilla-accent);
+}
+
+.vanilla-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(2.2rem, 1fr));
+  gap: .65rem .9rem;
+  align-items: center;
+}
+
+.vanilla-calendar-cell {
+  min-height: 2.6rem;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.5rem, 3vw, 2.7rem);
+  font-weight: 500;
+  color: rgba(255,255,255,0.94);
+  border-radius: 999px;
+}
+
+.vanilla-calendar-cell--label,
+.vanilla-calendar-cell--muted {
+  color: rgba(255,255,255,0.42);
+}
+
+.vanilla-calendar-cell--today {
+  background: var(--vanilla-accent);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .vanilla-scene--analog {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding-top: calc(var(--safe-top) + .8rem);
+    gap: .8rem;
+  }
+
+  .vanilla-analog-face {
+    width: min(50vw, 22rem);
+    height: min(50vw, 22rem);
+  }
+
+  .vanilla-analog-hand--hour {
+    height: 6rem;
+    margin-top: -6rem;
+  }
+
+  .vanilla-analog-hand--minute {
+    height: 8.7rem;
+    margin-top: -8.7rem;
+  }
+
+  .vanilla-analog-hand--second {
+    height: 9.7rem;
+    margin-top: -9.7rem;
+  }
+}
