@@ -11,6 +11,307 @@
   <link rel="icon" type="image/x-icon" href="ico/standby-noir.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="ico/standby-noir.ico" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <style>
+    /* Settings shell additions: page-based, iOS-like navigation */
+    .settings-app {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .settings-page {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      background: inherit;
+    }
+
+    .settings-page.active {
+      display: flex;
+    }
+
+    .settings-page-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 0 28px;
+    }
+
+    .settings-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      background: rgba(18, 18, 20, 0.84);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .settings-page-header h2,
+    .settings-page-header h1 {
+      margin: 0;
+      font: inherit;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .settings-page-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .settings-page-subtitle {
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(235,235,245,0.55);
+    }
+
+    .settings-nav-button,
+    .settings-back,
+    .settings-close,
+    .settings-done-mini {
+      appearance: none;
+      border: 0;
+      background: none;
+      color: #0a84ff;
+      font: inherit;
+      font-size: 17px;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+
+    .settings-back {
+      min-width: 54px;
+      text-align: left;
+    }
+
+    .settings-done-mini,
+    .settings-close {
+      min-width: 54px;
+      text-align: right;
+    }
+
+    .settings-page-spacer {
+      width: 54px;
+      flex: 0 0 54px;
+    }
+
+    .settings-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 18px 16px 0;
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .settings-group-title {
+      margin: 0 4px;
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(235,235,245,0.45);
+    }
+
+    .settings-card {
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(28,28,30,0.95);
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    }
+
+    .settings-card > * + * {
+      border-top: 1px solid rgba(255,255,255,0.055);
+    }
+
+    .settings-nav-row,
+    .settings-info-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px 16px;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .settings-nav-row-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .settings-nav-row-title {
+      font-size: 16px;
+      line-height: 1.3;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .settings-nav-row-detail,
+    .settings-row-description {
+      font-size: 13px;
+      line-height: 1.38;
+      color: rgba(235,235,245,0.58);
+    }
+
+    .settings-nav-row-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: rgba(235,235,245,0.62);
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .settings-chevron {
+      color: rgba(235,235,245,0.3);
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .settings-description-block {
+      padding: 0 18px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(235,235,245,0.54);
+    }
+
+    .settings-description-block:first-child {
+      padding-top: 12px;
+    }
+
+    .settings-description-block:last-child {
+      padding-bottom: 12px;
+    }
+
+    .settings-form-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(28,28,30,0.95);
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    }
+
+    .settings-form-card > * + * {
+      border-top: 1px solid rgba(255,255,255,0.055);
+    }
+
+    .settings-form-card .field {
+      margin: 0;
+      padding: 15px 16px;
+      border-radius: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 54px;
+    }
+
+    .settings-form-card .field > span:first-child {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: 16px;
+      line-height: 1.3;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .settings-form-card .field input[type="text"],
+    .settings-form-card .field input[type="number"],
+    .settings-form-card .field input[type="color"],
+    .settings-form-card .field input[type="range"],
+    .settings-form-card .field textarea,
+    .settings-form-card .field select {
+      flex: 0 1 54%;
+      max-width: 54%;
+    }
+
+    .settings-form-card .checkbox-field input[type="checkbox"] {
+      order: 2;
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+
+    .settings-form-card .checkbox-field > span:last-child {
+      flex: 1 1 auto;
+      order: 1;
+    }
+
+    .settings-form-card textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .settings-inline-meta {
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.42;
+      color: rgba(235,235,245,0.56);
+    }
+
+    .schema-page-host:empty,
+    .settings-form-card:empty,
+    .settings-card:empty {
+      display: none;
+    }
+
+    .settings-design-settings-note {
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(235,235,245,0.54);
+    }
+
+    @media (max-width: 820px) {
+      .settings-page-header {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .settings-groups {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .settings-form-card .field {
+        gap: 12px;
+      }
+      .settings-form-card .field input[type="text"],
+      .settings-form-card .field input[type="number"],
+      .settings-form-card .field input[type="color"],
+      .settings-form-card .field input[type="range"],
+      .settings-form-card .field textarea,
+      .settings-form-card .field select {
+        flex-basis: 50%;
+        max-width: 50%;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="app" class="app">
@@ -26,7 +327,7 @@
           <div class="rotate-phone"></div>
           <div class="rotate-arrow">↻</div>
         </div>
-        <div class="overlay-title">Rotate iPhone</div>
+        <div class="overlay-title">↻ Rotate iPhone</div>
         <div class="overlay-subtitle">StandBy looks best in landscape.</div>
       </div>
     </div>
@@ -38,147 +339,1404 @@
     <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
       <div class="settings-backdrop" data-action="close-settings"></div>
       <aside class="settings-panel" role="dialog" aria-modal="true" aria-label="Standby settings">
-        <header class="settings-header">
-          <div>
-            <div class="settings-kicker">Standby Suite</div>
-            <h1>Settings</h1>
-          </div>
-          <button class="settings-close" data-action="close-settings" aria-label="Close settings">Done</button>
-        </header>
+        <div class="settings-app" id="settings-app">
 
-        <div class="settings-body">
-          <section class="settings-section">
-            <h2>Design</h2>
-            <div class="settings-grid">
-              <label class="field">
-                <span>Design</span>
-                <select id="field-designId"></select>
-              </label>
+          <section class="settings-page active" data-settings-page="root">
+            <header class="settings-page-header">
+              <div class="settings-page-spacer" aria-hidden="true"></div>
+              <div class="settings-page-title-wrap">
+                <div class="settings-kicker">Standby Suite</div>
+                <h1>Settings</h1>
+              </div>
+              <button class="settings-close" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
 
-              <label class="field">
-                <span>Style</span>
-                <select id="field-styleId"></select>
-              </label>
-            </div>
-            <div id="design-source" class="meta-line"></div>
-          </section>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <h2 class="settings-group-title">Appearance</h2>
+                  <div class="settings-card">
+                    <button class="settings-nav-row" type="button" data-settings-target="design">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Design</span>
+                        <span class="settings-nav-row-detail">Choose design and style.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span id="settings-root-design-summary">—</span>
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
 
-          <section class="settings-section">
-            <h2>Display</h2>
-            <div class="settings-grid">
-              <label class="field">
-                <span>Turn off time</span>
-                <select id="field-turnOffMinutes">
-                  <option value="0">Never</option>
-                  <option value="10">10 minutes</option>
-                  <option value="15">15 minutes</option>
-                  <option value="30">30 minutes</option>
-                  <option value="45">45 minutes</option>
-                  <option value="60">60 minutes</option>
-                  <option value="120">120 minutes</option>
-                </select>
-              </label>
+                    <button class="settings-nav-row" type="button" data-settings-target="display">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Display</span>
+                        <span class="settings-nav-row-detail">Time format, sleep timer, wake lock, brightness.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
 
-              <label class="field checkbox-field">
-                <input id="field-fullScreen" type="checkbox">
-                <span>Fullscreen</span>
-              </label>
+                    <button class="settings-nav-row" type="button" data-settings-target="anti-burnin">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Anti Burn-In</span>
+                        <span class="settings-nav-row-detail">Pixel shift, drift, dim pulse and timing.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
+                  </div>
+                </section>
 
-              <label class="field checkbox-field">
-                <input id="field-wakeLockEnabled" type="checkbox">
-                <span>Keep screen awake when possible</span>
-              </label>
+                <section class="settings-group">
+                  <h2 class="settings-group-title">Content</h2>
+                  <div class="settings-card">
+                    <button class="settings-nav-row" type="button" data-settings-target="common-data">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Common Data</span>
+                        <span class="settings-nav-row-detail">Shared labels and colors.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
 
-              <label class="field checkbox-field">
-                <input id="field-use24Hour" type="checkbox">
-                <span>24-hour time</span>
-              </label>
+                    <button class="settings-nav-row" type="button" data-settings-target="design-settings">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Design Settings</span>
+                        <span class="settings-nav-row-detail">All supported design-specific options.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span id="settings-root-design-settings-summary"></span>
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
+                  </div>
+                </section>
 
-              <label class="field checkbox-field">
-                <input id="field-showSeconds" type="checkbox">
-                <span>Show seconds</span>
-              </label>
-
-              <label class="field">
-                <span>Brightness</span>
-                <input id="field-brightness" type="range" min="0.35" max="1" step="0.01">
-              </label>
-            </div>
-          </section>
-
-          <section class="settings-section">
-            <h2>Anti burn-in</h2>
-            <div class="settings-grid">
-              <label class="field checkbox-field">
-                <input id="field-antiBurnInPixelShift" type="checkbox">
-                <span>Pixel shift</span>
-              </label>
-
-              <label class="field checkbox-field">
-                <input id="field-antiBurnInDrift" type="checkbox">
-                <span>Slow drift</span>
-              </label>
-
-              <label class="field checkbox-field">
-                <input id="field-antiBurnInDimPulse" type="checkbox">
-                <span>Dim pulse</span>
-              </label>
-
-              <label class="field">
-                <span>Shift amount</span>
-                <input id="field-shiftAmount" type="range" min="2" max="18" step="1">
-              </label>
-
-              <label class="field">
-                <span>Shift every</span>
-                <select id="field-shiftIntervalSec">
-                  <option value="30">30 sec</option>
-                  <option value="45">45 sec</option>
-                  <option value="60">60 sec</option>
-                  <option value="90">90 sec</option>
-                  <option value="120">120 sec</option>
-                </select>
-              </label>
+                <section class="settings-group">
+                  <h2 class="settings-group-title">Diagnostics</h2>
+                  <div class="settings-card">
+                    <button class="settings-nav-row" type="button" data-settings-target="loaded-scripts">
+                      <span class="settings-nav-row-main">
+                        <span class="settings-nav-row-title">Loaded Scripts</span>
+                        <span class="settings-nav-row-detail">Inspect registered designs and sources.</span>
+                      </span>
+                      <span class="settings-nav-row-value">
+                        <span class="settings-chevron">›</span>
+                      </span>
+                    </button>
+                  </div>
+                </section>
+              </div>
             </div>
           </section>
 
-          <section class="settings-section">
-            <h2>Common data</h2>
-            <div class="settings-grid">
-              <label class="field">
-                <span>Alarm label</span>
-                <input id="field-alarmText" type="text" placeholder="8:30 AM">
-              </label>
+          <section class="settings-page" data-settings-page="design">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Design</h2>
+                <div class="settings-page-subtitle">Design changes the overall system. Style stays inside the current design.</div>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <div class="settings-form-card">
+                    <label class="field">
+                      <span>Design</span>
+                      <select id="field-designId"></select>
+                    </label>
 
-              <label class="field">
-                <span>Travel time label</span>
-                <input id="field-travelTimeText" type="text" placeholder="12:17">
-              </label>
-
-              <label class="field">
-                <span>Accent color</span>
-                <input id="field-accentColor" type="color">
-              </label>
+                    <label class="field">
+                      <span>Style</span>
+                      <select id="field-styleId"></select>
+                    </label>
+                  </div>
+                  <div id="design-source" class="settings-inline-meta"></div>
+                </section>
+              </div>
             </div>
           </section>
 
-          <section class="settings-section">
-            <h2>Design options</h2>
-            <div id="dynamic-design-fields" class="settings-grid"></div>
+          <section class="settings-page" data-settings-page="display">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Display</h2>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <div class="settings-form-card">
+                    <label class="field">
+                      <span>Turn off time</span>
+                      <select id="field-turnOffMinutes">
+                        <option value="0">Never</option>
+                        <option value="10">10 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">60 minutes</option>
+                        <option value="120">120 minutes</option>
+                      </select>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-fullScreen" type="checkbox">
+                      <span>Fullscreen</span>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-wakeLockEnabled" type="checkbox">
+                      <span>Keep screen awake when possible</span>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-use24Hour" type="checkbox">
+                      <span>24-hour time</span>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-showSeconds" type="checkbox">
+                      <span>Show seconds</span>
+                    </label>
+
+                    <label class="field">
+                      <span>Brightness</span>
+                      <input id="field-brightness" type="range" min="0.35" max="1" step="0.01">
+                    </label>
+                  </div>
+                </section>
+              </div>
+            </div>
           </section>
 
-          <section class="settings-section">
-            <h2>Loaded scripts</h2>
-            <div id="loaded-designs" class="loaded-designs"></div>
+          <section class="settings-page" data-settings-page="anti-burnin">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Anti Burn-In</h2>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <div class="settings-form-card">
+                    <label class="field checkbox-field">
+                      <input id="field-antiBurnInPixelShift" type="checkbox">
+                      <span>Pixel shift</span>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-antiBurnInDrift" type="checkbox">
+                      <span>Slow drift</span>
+                    </label>
+
+                    <label class="field checkbox-field">
+                      <input id="field-antiBurnInDimPulse" type="checkbox">
+                      <span>Dim pulse</span>
+                    </label>
+
+                    <label class="field">
+                      <span>Shift amount</span>
+                      <input id="field-shiftAmount" type="range" min="2" max="18" step="1">
+                    </label>
+
+                    <label class="field">
+                      <span>Shift every</span>
+                      <select id="field-shiftIntervalSec">
+                        <option value="30">30 sec</option>
+                        <option value="45">45 sec</option>
+                        <option value="60">60 sec</option>
+                        <option value="90">90 sec</option>
+                        <option value="120">120 sec</option>
+                      </select>
+                    </label>
+                  </div>
+                </section>
+              </div>
+            </div>
           </section>
+
+          <section class="settings-page" data-settings-page="common-data">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Common Data</h2>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <div class="settings-form-card">
+                    <label class="field">
+                      <span>Alarm label</span>
+                      <input id="field-alarmText" type="text" placeholder="8:30 AM">
+                    </label>
+
+                    <label class="field">
+                      <span>Travel time label</span>
+                      <input id="field-travelTimeText" type="text" placeholder="12:17">
+                    </label>
+
+                    <label class="field">
+                      <span>Accent color</span>
+                      <input id="field-accentColor" type="color">
+                    </label>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-page" data-settings-page="design-settings">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Design Settings</h2>
+                <div class="settings-page-subtitle">Hidden in-scene controls must still exist here as schema-backed settings.</div>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group" id="design-settings-links-group"></section>
+                <section class="settings-group">
+                  <div id="dynamic-design-fields" class="settings-form-card"></div>
+                  <div id="design-settings-empty" class="settings-design-settings-note hidden">This design does not expose extra settings yet.</div>
+                </section>
+              </div>
+              <div id="settings-schema-pages" class="schema-page-host"></div>
+            </div>
+          </section>
+
+          <section class="settings-page" data-settings-page="loaded-scripts">
+            <header class="settings-page-header">
+              <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+              <div class="settings-page-title-wrap">
+                <h2>Loaded Scripts</h2>
+              </div>
+              <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+            </header>
+            <div class="settings-page-scroll">
+              <div class="settings-groups">
+                <section class="settings-group">
+                  <div id="loaded-designs" class="settings-form-card loaded-designs"></div>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <template id="settings-schema-page-template">
+            <section class="settings-page" data-settings-page="">
+              <header class="settings-page-header">
+                <button class="settings-back" type="button" data-settings-back>‹ Back</button>
+                <div class="settings-page-title-wrap">
+                  <h2 class="schema-page-title"></h2>
+                  <div class="settings-page-subtitle schema-page-subtitle"></div>
+                </div>
+                <button class="settings-done-mini" data-action="close-settings" aria-label="Close settings">Done</button>
+              </header>
+              <div class="settings-page-scroll">
+                <div class="settings-groups schema-page-groups"></div>
+              </div>
+            </section>
+          </template>
+
+          <template id="settings-schema-group-template">
+            <section class="settings-group schema-group">
+              <h2 class="settings-group-title schema-group-title hidden"></h2>
+              <div class="settings-form-card schema-group-fields"></div>
+              <div class="settings-card schema-group-links hidden"></div>
+              <div class="settings-description-block schema-group-description hidden"></div>
+            </section>
+          </template>
+
+          <template id="settings-schema-link-template">
+            <button class="settings-nav-row" type="button">
+              <span class="settings-nav-row-main">
+                <span class="settings-nav-row-title"></span>
+                <span class="settings-nav-row-detail hidden"></span>
+              </span>
+              <span class="settings-nav-row-value">
+                <span class="settings-chevron">›</span>
+              </span>
+            </button>
+          </template>
         </div>
       </aside>
     </div>
   </div>
 
-  <script src="./js/core.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    const STORAGE_KEY = "standby-suite-settings-v1";
+
+    const defaultSettings = {
+      designId: "vanilla",
+      designStyles: {},
+      turnOffMinutes: 30,
+      fullScreen: true,
+      wakeLockEnabled: true,
+      use24Hour: false,
+      showSeconds: false,
+      brightness: 0.82,
+      antiBurnInPixelShift: true,
+      antiBurnInDrift: true,
+      antiBurnInDimPulse: true,
+      shiftAmount: 8,
+      shiftIntervalSec: 90,
+      alarmText: "8:30 AM",
+      travelTimeText: "12:17",
+      accentColor: "#ff453a"
+    };
+
+    const registry = [];
+    let dynamicFieldRefs = [];
+    const queuedSchemaPages = [];
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+    
+    function isInstalledIosWebApp() {
+      return (
+        window.navigator.standalone === true ||
+        window.matchMedia('(display-mode: standalone)').matches
+      );
+    }
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return deepClone(defaultSettings);
+        return { ...deepClone(defaultSettings), ...JSON.parse(raw) };
+      } catch (_) {
+        return deepClone(defaultSettings);
+      }
+    }
+
+    function saveSettings(settings) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function loadStyleSheet(href) {
+      if (!href) return;
+      if ([...document.querySelectorAll('link[rel="stylesheet"]')].some((node) => node.href === href)) {
+        return;
+      }
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+
+    function isStructuredSchema(schema) {
+      return !!schema && !Array.isArray(schema) && Array.isArray(schema.pages);
+    }
+
+    function getSchemaFields(input) {
+      const out = [];
+      if (!input) return out;
+
+      if (Array.isArray(input)) {
+        for (const item of input) {
+          if (item && typeof item === "object" && item.key) out.push(item);
+        }
+        return out;
+      }
+
+      if (isStructuredSchema(input)) {
+        for (const page of input.pages || []) {
+          for (const group of page.groups || []) {
+            for (const field of group.fields || []) {
+              if (field && typeof field === "object" && field.key) out.push(field);
+            }
+          }
+        }
+      }
+
+      return out;
+    }
+
+    function ensureDesignDefaults(settings, design) {
+      const schemaFields = getSchemaFields(design.settingsSchema || []);
+      for (const item of schemaFields) {
+        if (!(item.key in settings) && Object.prototype.hasOwnProperty.call(item, "default")) {
+          settings[item.key] = item.default;
+        }
+      }
+      if (!settings.designStyles || typeof settings.designStyles !== "object") {
+        settings.designStyles = {};
+      }
+      if (!(design.id in settings.designStyles)) {
+        settings.designStyles[design.id] = 0;
+      }
+    }
+
+    function registerDesign(design) {
+      if (!design || !design.id || !design.name || typeof design.mount !== "function") {
+        throw new Error("A design must provide id, name, and mount(ctx).");
+      }
+      if (registry.some((item) => item.id === design.id)) {
+        throw new Error(`Duplicate design id: ${design.id}`);
+      }
+      registry.push(design);
+      if (window.Standby && window.Standby.app) {
+        window.Standby.app.handleRegistryChange();
+      }
+    }
+
+    window.Standby = {
+      version: "2.1.0",
+      registry,
+      registerDesign,
+      utils: {
+        clamp,
+        loadStyleSheet,
+        formatTimeParts(date, settings) {
+          const hoursRaw = date.getHours();
+          const minutes = String(date.getMinutes()).padStart(2, "0");
+          const seconds = String(date.getSeconds()).padStart(2, "0");
+          const use24 = !!settings.use24Hour;
+          const hours24 = String(hoursRaw).padStart(2, "0");
+          const hours12Num = hoursRaw % 12 || 12;
+          const hours12 = String(hours12Num);
+          return {
+            hoursRaw,
+            hours24,
+            hours12,
+            minutes,
+            seconds,
+            period: hoursRaw >= 12 ? "PM" : "AM",
+            displayHour: use24 ? hours24 : hours12
+          };
+        },
+        weekdayShort(date) {
+          return ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getDay()];
+        },
+        monthLong(date) {
+          return [
+            "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+            "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+          ][date.getMonth()];
+        },
+        monthShort(date) {
+          return ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"][date.getMonth()];
+        },
+        currentScriptPath() {
+          return document.currentScript ? document.currentScript.src : "";
+        }
+      },
+      settingsShell: {
+        openPage() {},
+        back() {},
+        reset() {},
+        registerSchemaPage(page) {
+          queuedSchemaPages.push(page);
+        }
+      },
+      app: null
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const app = createApp();
+      window.Standby.app = app;
+      app.init();
+    });
+
+    function createApp() {
+      const state = {
+        settings: loadSettings(),
+        currentDesign: null,
+        currentDesignApi: null,
+        wakeLock: null,
+        shiftTimer: null,
+        renderTimer: null,
+        sleepTimer: null,
+        sleepActive: false,
+        settingsOpen: false,
+        stageTapCount: 0,
+        lastTapAt: 0,
+        pointerStart: null,
+        lastWakeAt: Date.now(),
+        toastTimer: null,
+        schemaPageMap: new Map()
+      };
+
+      const els = {
+        app: document.getElementById("app"),
+        stageShell: document.getElementById("stage-shell"),
+        burninLayer: document.getElementById("burnin-layer"),
+        host: document.getElementById("design-host"),
+        rotateOverlay: document.getElementById("rotate-overlay"),
+        sleepOverlay: document.getElementById("sleep-overlay"),
+        settingsOverlay: document.getElementById("settings-overlay"),
+        settingsApp: document.getElementById("settings-app"),
+        rootDesignSummary: document.getElementById("settings-root-design-summary"),
+        rootDesignSettingsSummary: document.getElementById("settings-root-design-settings-summary"),
+        designSelect: document.getElementById("field-designId"),
+        styleSelect: document.getElementById("field-styleId"),
+        turnOffMinutes: document.getElementById("field-turnOffMinutes"),
+        fullScreen: document.getElementById("field-fullScreen"),
+        wakeLockEnabled: document.getElementById("field-wakeLockEnabled"),
+        use24Hour: document.getElementById("field-use24Hour"),
+        showSeconds: document.getElementById("field-showSeconds"),
+        brightness: document.getElementById("field-brightness"),
+        antiBurnInPixelShift: document.getElementById("field-antiBurnInPixelShift"),
+        antiBurnInDrift: document.getElementById("field-antiBurnInDrift"),
+        antiBurnInDimPulse: document.getElementById("field-antiBurnInDimPulse"),
+        shiftAmount: document.getElementById("field-shiftAmount"),
+        shiftIntervalSec: document.getElementById("field-shiftIntervalSec"),
+        alarmText: document.getElementById("field-alarmText"),
+        travelTimeText: document.getElementById("field-travelTimeText"),
+        accentColor: document.getElementById("field-accentColor"),
+        designSource: document.getElementById("design-source"),
+        loadedDesigns: document.getElementById("loaded-designs"),
+        dynamicFields: document.getElementById("dynamic-design-fields"),
+        designSettingsLinksGroup: document.getElementById("design-settings-links-group"),
+        designSettingsEmpty: document.getElementById("design-settings-empty"),
+        schemaPagesHost: document.getElementById("settings-schema-pages"),
+        schemaPageTemplate: document.getElementById("settings-schema-page-template"),
+        schemaGroupTemplate: document.getElementById("settings-schema-group-template"),
+        schemaLinkTemplate: document.getElementById("settings-schema-link-template")
+      };
+
+      const settingsShell = createSettingsShell(els, {
+        closeSettings,
+        queuedSchemaPages,
+        onExternalPageOpen(page) {
+          if (page && page.id) {
+            renderRegisteredStandaloneSchemaPage(page);
+          }
+        }
+      });
+      window.Standby.settingsShell = settingsShell;
+
+      function init() {
+        registry.forEach((design) => ensureDesignDefaults(state.settings, design));
+        if (!registry.some((item) => item.id === state.settings.designId) && registry.length) {
+          state.settings.designId = registry[0].id;
+        }
+        wireCommonEvents();
+        buildSettingsUI();
+        applyCommonUISettings();
+        mountDesign(state.settings.designId);
+        startRenderLoop();
+        startBurnInLoop();
+        restartSleepTimer();
+        updateRotateOverlay();
+        attemptWakeLockIfAllowed();
+      }
+
+      function handleRegistryChange() {
+        registry.forEach((design) => ensureDesignDefaults(state.settings, design));
+        buildSettingsUI();
+        if (!registry.some((item) => item.id === state.settings.designId) && registry.length) {
+          state.settings.designId = registry[0].id;
+        }
+        mountDesign(state.settings.designId);
+      }
+
+      function wireCommonEvents() {
+        for (const node of document.querySelectorAll("[data-action='close-settings']")) {
+          node.addEventListener("click", closeSettings);
+        }
+
+        els.designSelect.addEventListener("change", (event) => {
+          updateSetting("designId", event.target.value, { mount: true });
+        });
+
+        els.styleSelect.addEventListener("change", (event) => {
+          const design = getCurrentDesign();
+          if (!design) return;
+          state.settings.designStyles[design.id] = Number(event.target.value);
+          saveSettings(state.settings);
+          syncStyleSelect();
+          updateRootSummaries();
+          renderNow();
+        });
+
+        bindInput(els.turnOffMinutes, "turnOffMinutes", "number", { after: restartSleepTimer });
+        bindInput(els.fullScreen, "fullScreen", "boolean");
+        bindInput(els.wakeLockEnabled, "wakeLockEnabled", "boolean", { after: attemptWakeLockIfAllowed });
+        bindInput(els.use24Hour, "use24Hour", "boolean");
+        bindInput(els.showSeconds, "showSeconds", "boolean");
+        bindInput(els.brightness, "brightness", "number", { after: applyCommonUISettings });
+        bindInput(els.antiBurnInPixelShift, "antiBurnInPixelShift", "boolean", { after: startBurnInLoop });
+        bindInput(els.antiBurnInDrift, "antiBurnInDrift", "boolean", { after: startBurnInLoop });
+        bindInput(els.antiBurnInDimPulse, "antiBurnInDimPulse", "boolean", { after: applyCommonUISettings });
+        bindInput(els.shiftAmount, "shiftAmount", "number");
+        bindInput(els.shiftIntervalSec, "shiftIntervalSec", "number", { after: startBurnInLoop });
+        bindInput(els.alarmText, "alarmText", "string");
+        bindInput(els.travelTimeText, "travelTimeText", "string");
+        bindInput(els.accentColor, "accentColor", "string");
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            attemptWakeLockIfAllowed();
+            restartSleepTimer();
+            renderNow();
+          }
+        });
+
+        window.addEventListener("orientationchange", updateRotateOverlay);
+        window.addEventListener("resize", () => {
+          updateRotateOverlay();
+          renderNow();
+        });
+
+        document.addEventListener("pointerdown", onPointerDown, { passive: true });
+        document.addEventListener("pointerup", onPointerUp, { passive: true });
+        document.addEventListener("pointermove", onPointerMove, { passive: true });
+      }
+
+      function bindInput(element, key, type, options = {}) {
+        if (!element) return;
+        const eventName = element.type === "range" || element.tagName === "INPUT" || element.tagName === "TEXTAREA" ? "input" : "change";
+        element.addEventListener(eventName, (event) => {
+          let value;
+          if (type === "boolean") value = !!event.target.checked;
+          else if (type === "number") value = Number(event.target.value);
+          else value = event.target.value;
+          updateSetting(key, value, { after: options.after });
+        });
+      }
+
+      function updateSetting(key, value, options = {}) {
+        state.settings[key] = value;
+        if (typeof options.after === "function") {
+          options.after();
+        }
+        if (options.mount) {
+          mountDesign(value);
+        } else {
+          applyCommonUISettings();
+          buildSettingsUI();
+          renderNow();
+        }
+        saveSettings(state.settings);
+      }
+
+      function buildSettingsUI() {
+        const design = getCurrentDesign() || registry[0];
+
+        els.designSelect.innerHTML = registry
+          .map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`)
+          .join("");
+        if (design) {
+          els.designSelect.value = state.settings.designId;
+        }
+
+        syncStyleSelect();
+
+        els.turnOffMinutes.value = String(state.settings.turnOffMinutes);
+        els.fullScreen.checked = !!state.settings.fullScreen;
+        els.wakeLockEnabled.checked = !!state.settings.wakeLockEnabled;
+        els.use24Hour.checked = !!state.settings.use24Hour;
+        els.showSeconds.checked = !!state.settings.showSeconds;
+        els.brightness.value = String(state.settings.brightness);
+        els.antiBurnInPixelShift.checked = !!state.settings.antiBurnInPixelShift;
+        els.antiBurnInDrift.checked = !!state.settings.antiBurnInDrift;
+        els.antiBurnInDimPulse.checked = !!state.settings.antiBurnInDimPulse;
+        els.shiftAmount.value = String(state.settings.shiftAmount);
+        els.shiftIntervalSec.value = String(state.settings.shiftIntervalSec);
+        els.alarmText.value = state.settings.alarmText || "";
+        els.travelTimeText.value = state.settings.travelTimeText || "";
+        els.accentColor.value = state.settings.accentColor || "#ff453a";
+
+        els.loadedDesigns.innerHTML = registry.map((item) => (
+          `<div class="settings-info-row"><div class="settings-nav-row-main"><div class="settings-nav-row-title">${escapeHtml(item.name)}</div><div class="settings-row-description">${escapeHtml(item.id)}${item.sourcePath ? ` · ${escapeHtml(item.sourcePath.split("/").slice(-1)[0])}` : ""}</div></div></div>`
+        )).join("");
+
+        els.designSource.textContent = design && design.sourcePath
+          ? `Loaded from: ${design.sourcePath.split("/").slice(-1)[0]}`
+          : "Loaded from script tag.";
+
+        renderDesignSettingsMenu();
+        updateRootSummaries();
+      }
+
+      function updateRootSummaries() {
+        const design = getCurrentDesign();
+        if (!design) {
+          els.rootDesignSummary.textContent = "—";
+          els.rootDesignSettingsSummary.textContent = "";
+          return;
+        }
+        const styles = design.styles && design.styles.length ? design.styles : [{ name: "Default" }];
+        const styleIndex = getCurrentStyleIndex();
+        const styleName = styles[styleIndex] && (styles[styleIndex].name || styles[styleIndex].id) || "Default";
+        els.rootDesignSummary.textContent = `${design.name} · ${styleName}`;
+
+        const schemaInfo = describeDesignSettings(design);
+        els.rootDesignSettingsSummary.textContent = schemaInfo.summary;
+      }
+
+      function describeDesignSettings(design) {
+        if (!design || !design.settingsSchema) {
+          return { summary: "", fields: 0, pages: 0 };
+        }
+        if (Array.isArray(design.settingsSchema)) {
+          return {
+            summary: design.settingsSchema.length ? `${design.settingsSchema.length} option${design.settingsSchema.length === 1 ? "" : "s"}` : "",
+            fields: design.settingsSchema.length,
+            pages: 0
+          };
+        }
+        if (isStructuredSchema(design.settingsSchema)) {
+          const fields = getSchemaFields(design.settingsSchema).length;
+          const pages = (design.settingsSchema.pages || []).length;
+          if (!fields && !pages) return { summary: "", fields: 0, pages: 0 };
+          return {
+            summary: `${pages} page${pages === 1 ? "" : "s"}${fields ? ` · ${fields} field${fields === 1 ? "" : "s"}` : ""}`,
+            fields,
+            pages
+          };
+        }
+        return { summary: "", fields: 0, pages: 0 };
+      }
+
+      function syncStyleSelect() {
+        const design = getCurrentDesign() || registry[0];
+        const styles = design && design.styles && design.styles.length
+          ? design.styles
+          : [{ id: "default", name: "Default" }];
+
+        if (design && !(design.id in state.settings.designStyles)) {
+          state.settings.designStyles[design.id] = 0;
+        }
+        if (design) {
+          state.settings.designStyles[design.id] = clamp(
+            Number(state.settings.designStyles[design.id]) || 0,
+            0,
+            styles.length - 1
+          );
+        }
+
+        els.styleSelect.innerHTML = styles.map((style, index) => (
+          `<option value="${index}">${escapeHtml(style.name || style.id || `Style ${index + 1}`)}</option>`
+        )).join("");
+
+        if (design) {
+          els.styleSelect.value = String(state.settings.designStyles[design.id]);
+        }
+      }
+
+      function renderDesignSettingsMenu() {
+        dynamicFieldRefs = [];
+        for (const node of document.querySelectorAll('.settings-page[data-settings-page^="design-schema:"], .settings-page[data-settings-page^="schema-external:"]')) {
+          node.remove();
+        }
+        state.schemaPageMap.clear();
+        els.dynamicFields.innerHTML = "";
+        els.designSettingsLinksGroup.innerHTML = "";
+        els.schemaPagesHost.innerHTML = "";
+
+        const design = getCurrentDesign() || registry[0];
+        const schema = design && design.settingsSchema ? design.settingsSchema : null;
+
+        if (!schema) {
+          els.designSettingsEmpty.classList.remove("hidden");
+          return;
+        }
+
+        els.designSettingsEmpty.classList.add("hidden");
+
+        if (Array.isArray(schema)) {
+          renderFieldsIntoContainer(els.dynamicFields, schema);
+          if (!els.dynamicFields.children.length) {
+            els.designSettingsEmpty.classList.remove("hidden");
+          }
+          return;
+        }
+
+        if (isStructuredSchema(schema)) {
+          const rootCard = document.createElement("div");
+          rootCard.className = "settings-card";
+          els.designSettingsLinksGroup.appendChild(rootCard);
+
+          const pages = schema.pages || [];
+          for (const page of pages) {
+            const pageId = `design-schema:${design.id}:${page.id || slugify(page.title || "page")}`;
+            rootCard.appendChild(createSchemaNavRow(page.title || "Settings page", page.description || "", pageId));
+            renderStructuredSchemaPage(pageId, page.title || "Settings", page.description || "", page.groups || []);
+          }
+
+          if (!(schema.pages || []).length) {
+            els.designSettingsEmpty.classList.remove("hidden");
+          }
+        }
+      }
+
+      function renderStructuredSchemaPage(pageId, title, subtitle, groups) {
+        const pageNode = createSchemaPageNode(pageId, title, subtitle);
+        const groupsHost = pageNode.querySelector(".schema-page-groups");
+
+        for (const group of groups || []) {
+          const groupNode = els.schemaGroupTemplate.content.firstElementChild.cloneNode(true);
+          const titleNode = groupNode.querySelector(".schema-group-title");
+          const descriptionNode = groupNode.querySelector(".schema-group-description");
+          const fieldHost = groupNode.querySelector(".schema-group-fields");
+          const linksHost = groupNode.querySelector(".schema-group-links");
+
+          if (group.title) {
+            titleNode.textContent = group.title;
+            titleNode.classList.remove("hidden");
+          }
+          if (group.description) {
+            descriptionNode.textContent = group.description;
+            descriptionNode.classList.remove("hidden");
+          }
+
+          renderFieldsIntoContainer(fieldHost, group.fields || []);
+
+          if (Array.isArray(group.pages) && group.pages.length) {
+            linksHost.classList.remove("hidden");
+            for (const subpage of group.pages) {
+              const subPageId = `${pageId}:${subpage.id || slugify(subpage.title || "page")}`;
+              linksHost.appendChild(createSchemaNavRow(subpage.title || "More", subpage.description || "", subPageId));
+              renderStructuredSchemaPage(subPageId, subpage.title || "Settings", subpage.description || "", subpage.groups || []);
+            }
+          }
+
+          const hasContent = fieldHost.children.length || linksHost.children.length || !titleNode.classList.contains("hidden") || !descriptionNode.classList.contains("hidden");
+          if (hasContent) groupsHost.appendChild(groupNode);
+        }
+
+        if (!groupsHost.children.length) {
+          const emptyGroup = document.createElement("section");
+          emptyGroup.className = "settings-group";
+          emptyGroup.innerHTML = `<div class="settings-design-settings-note">No settings on this page.</div>`;
+          groupsHost.appendChild(emptyGroup);
+        }
+      }
+
+      function renderRegisteredStandaloneSchemaPage(page) {
+        const pageId = page && page.id ? `schema-external:${page.id}` : null;
+        if (!pageId) return;
+        if (state.schemaPageMap.has(pageId)) return;
+        renderStructuredSchemaPage(pageId, page.title || "Settings", page.description || "", page.groups || []);
+      }
+
+      function createSchemaPageNode(pageId, title, subtitle) {
+        if (state.schemaPageMap.has(pageId)) {
+          const existing = state.schemaPageMap.get(pageId);
+          existing.querySelector(".schema-page-title").textContent = title || "Settings";
+          const subtitleNode = existing.querySelector(".schema-page-subtitle");
+          subtitleNode.textContent = subtitle || "";
+          subtitleNode.classList.toggle("hidden", !subtitle);
+          return existing;
+        }
+
+        const node = els.schemaPageTemplate.content.firstElementChild.cloneNode(true);
+        node.dataset.settingsPage = pageId;
+        node.querySelector(".schema-page-title").textContent = title || "Settings";
+        const subtitleNode = node.querySelector(".schema-page-subtitle");
+        subtitleNode.textContent = subtitle || "";
+        subtitleNode.classList.toggle("hidden", !subtitle);
+        els.settingsApp.appendChild(node);
+        state.schemaPageMap.set(pageId, node);
+        return node;
+      }
+
+      function createSchemaNavRow(title, detail, targetPageId) {
+        const row = els.schemaLinkTemplate.content.firstElementChild.cloneNode(true);
+        row.dataset.settingsTarget = targetPageId;
+        row.querySelector(".settings-nav-row-title").textContent = title;
+        const detailNode = row.querySelector(".settings-nav-row-detail");
+        detailNode.textContent = detail || "";
+        detailNode.classList.toggle("hidden", !detail);
+        return row;
+      }
+
+      function renderFieldsIntoContainer(container, fields) {
+        for (const item of fields || []) {
+          if (!item || typeof item !== "object") continue;
+
+          if (item.type === "description" || item.type === "info") {
+            const desc = document.createElement("div");
+            desc.className = "settings-description-block";
+            desc.textContent = item.text || item.label || "";
+            container.appendChild(desc);
+            continue;
+          }
+
+          if (item.type === "link" && item.pageId) {
+            container.appendChild(createSchemaNavRow(item.label || "More", item.description || "", item.pageId));
+            continue;
+          }
+
+          if (!(item.key in state.settings) && Object.prototype.hasOwnProperty.call(item, "default")) {
+            state.settings[item.key] = item.default;
+          }
+
+          const label = document.createElement("label");
+          label.className = item.type === "checkbox" || item.type === "toggle" ? "field checkbox-field" : "field";
+
+          let input;
+          if (item.type === "select") {
+            const wrap = document.createElement("span");
+            wrap.textContent = item.label || item.key;
+            label.appendChild(wrap);
+            input = document.createElement("select");
+            for (const option of item.options || []) {
+              const node = document.createElement("option");
+              node.value = option.value;
+              node.textContent = option.label;
+              input.appendChild(node);
+            }
+            input.value = String(state.settings[item.key] ?? "");
+            label.appendChild(input);
+          } else if (item.type === "checkbox" || item.type === "toggle") {
+            input = document.createElement("input");
+            input.type = "checkbox";
+            input.checked = !!state.settings[item.key];
+            label.appendChild(input);
+            const wrap = document.createElement("span");
+            wrap.textContent = item.label || item.key;
+            label.appendChild(wrap);
+          } else if (item.type === "textarea") {
+            const wrap = document.createElement("span");
+            wrap.textContent = item.label || item.key;
+            label.appendChild(wrap);
+            input = document.createElement("textarea");
+            input.value = String(state.settings[item.key] ?? "");
+            if (item.placeholder) input.placeholder = item.placeholder;
+            label.appendChild(input);
+          } else {
+            const wrap = document.createElement("span");
+            wrap.textContent = item.label || item.key;
+            label.appendChild(wrap);
+            input = document.createElement("input");
+            input.type = mapFieldTypeToInputType(item.type);
+            if (item.min !== undefined) input.min = item.min;
+            if (item.max !== undefined) input.max = item.max;
+            if (item.step !== undefined) input.step = item.step;
+            if (item.placeholder) input.placeholder = item.placeholder;
+            input.value = String(state.settings[item.key] ?? "");
+            label.appendChild(input);
+          }
+
+          const eventName = item.type === "checkbox" || item.type === "toggle" || item.type === "select" ? "change" : "input";
+          input.addEventListener(eventName, () => {
+            let value;
+            if (item.type === "checkbox" || item.type === "toggle") value = !!input.checked;
+            else if (item.type === "range" || item.type === "number") value = Number(input.value);
+            else value = input.value;
+            state.settings[item.key] = value;
+            saveSettings(state.settings);
+            buildSettingsUI();
+            renderNow();
+          });
+
+          dynamicFieldRefs.push({ key: item.key, input, type: item.type });
+          container.appendChild(label);
+        }
+      }
+
+      function applyCommonUISettings() {
+        document.documentElement.style.setProperty("--app-brightness", String(clamp(Number(state.settings.brightness) || 0.82, 0.35, 1)));
+        document.documentElement.style.setProperty("--dim-pulse-factor", state.settings.antiBurnInDimPulse ? "0.985" : "1");
+        if (state.settings.antiBurnInDimPulse) {
+          els.burninLayer.getAnimations().forEach((animation) => animation.cancel());
+          els.burninLayer.animate(
+            [
+              { opacity: 0.985 },
+              { opacity: 1 },
+              { opacity: 0.985 }
+            ],
+            {
+              duration: 14000,
+              iterations: Infinity,
+              easing: "ease-in-out"
+            }
+          );
+        } else {
+          els.burninLayer.getAnimations().forEach((animation) => animation.cancel());
+          els.burninLayer.style.opacity = "1";
+        }
+      }
+
+      function getCurrentDesign() {
+        return registry.find((item) => item.id === state.settings.designId) || registry[0] || null;
+      }
+
+      function mountDesign(designId) {
+        const design = registry.find((item) => item.id === designId) || registry[0];
+        if (!design) return;
+
+        registry.forEach((item) => ensureDesignDefaults(state.settings, item));
+        state.settings.designId = design.id;
+
+        if (state.currentDesignApi && typeof state.currentDesignApi.destroy === "function") {
+          state.currentDesignApi.destroy();
+        }
+
+        els.host.innerHTML = "";
+        const ctx = {
+          host: els.host,
+          settings: state.settings,
+          utils: window.Standby.utils,
+          app: publicApi()
+        };
+        state.currentDesign = design;
+        state.currentDesignApi = design.mount(ctx) || null;
+        buildSettingsUI();
+        renderNow();
+        saveSettings(state.settings);
+      }
+
+      function renderNow() {
+        if (!state.currentDesignApi || typeof state.currentDesignApi.render !== "function") return;
+        state.currentDesignApi.render({
+          now: new Date(),
+          settings: state.settings,
+          styleIndex: getCurrentStyleIndex(),
+          app: publicApi()
+        });
+      }
+
+      function startRenderLoop() {
+        clearInterval(state.renderTimer);
+        state.renderTimer = setInterval(renderNow, 250);
+        renderNow();
+      }
+
+      function getCurrentStyleIndex() {
+        const design = getCurrentDesign();
+        if (!design) return 0;
+        const max = (design.styles && design.styles.length ? design.styles.length : 1) - 1;
+        state.settings.designStyles[design.id] = clamp(Number(state.settings.designStyles[design.id]) || 0, 0, max);
+        return state.settings.designStyles[design.id];
+      }
+
+      function cycleStyle(direction) {
+        const design = getCurrentDesign();
+        if (!design || !design.styles || design.styles.length < 2) return;
+        const count = design.styles.length;
+        const current = getCurrentStyleIndex();
+        const next = (current + direction + count) % count;
+        state.settings.designStyles[design.id] = next;
+        saveSettings(state.settings);
+        syncStyleSelect();
+        updateRootSummaries();
+        renderNow();
+      }
+
+      function startBurnInLoop() {
+        clearInterval(state.shiftTimer);
+        updateBurnInShift();
+        state.shiftTimer = setInterval(updateBurnInShift, Math.max(15, Number(state.settings.shiftIntervalSec) || 90) * 1000);
+      }
+
+      function updateBurnInShift() {
+        const amount = Number(state.settings.shiftAmount) || 8;
+        const pixelShift = !!state.settings.antiBurnInPixelShift;
+        const drift = !!state.settings.antiBurnInDrift;
+        const x = pixelShift ? Math.round((Math.random() * 2 - 1) * amount) : 0;
+        const y = pixelShift ? Math.round((Math.random() * 2 - 1) * amount) : 0;
+        const r = drift ? ((Math.random() * 2 - 1) * 0.35).toFixed(3) : "0";
+        document.documentElement.style.setProperty("--burnin-x", `${x}px`);
+        document.documentElement.style.setProperty("--burnin-y", `${y}px`);
+        document.documentElement.style.setProperty("--burnin-rotate", `${r}deg`);
+      }
+
+      function restartSleepTimer() {
+        state.lastWakeAt = Date.now();
+        if (state.sleepActive) {
+          state.sleepActive = false;
+          els.sleepOverlay.classList.remove("visible");
+        }
+        clearTimeout(state.sleepTimer);
+        const minutes = Number(state.settings.turnOffMinutes) || 0;
+        if (!minutes) return;
+        state.sleepTimer = setTimeout(() => {
+          state.sleepActive = true;
+          els.sleepOverlay.classList.add("visible");
+        }, minutes * 60 * 1000);
+      }
+
+      function onPointerDown(event) {
+        if (state.settingsOpen) return;
+        if (state.sleepActive) {
+          restartSleepTimer();
+        }
+        state.pointerStart = { x: event.clientX, y: event.clientY, at: Date.now() };
+      }
+
+      function onPointerMove() {
+        // reserved for future gesture upgrades
+      }
+
+      function onPointerUp(event) {
+        const now = Date.now();
+
+        if (state.sleepActive) {
+          restartSleepTimer();
+          attemptWakeLockIfAllowed();
+          return;
+        }
+
+        maybeRequestFullscreen();
+        attemptWakeLockIfAllowed();
+        restartSleepTimer();
+
+        if (state.settingsOpen) return;
+
+        const isQuickTap = now - state.lastTapAt < 700;
+        if (isQuickTap) state.stageTapCount += 1;
+        else state.stageTapCount = 1;
+        state.lastTapAt = now;
+
+        if (state.stageTapCount >= 5) {
+          state.stageTapCount = 0;
+          openSettings();
+          return;
+        }
+
+        if (!state.pointerStart) return;
+        const dx = event.clientX - state.pointerStart.x;
+        const dy = event.clientY - state.pointerStart.y;
+        const duration = now - state.pointerStart.at;
+        state.pointerStart = null;
+
+        if (duration < 700 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+          cycleStyle(dx < 0 ? 1 : -1);
+        }
+      }
+
+      async function attemptWakeLockIfAllowed() {
+        if (!state.settings.wakeLockEnabled || !("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+        try {
+          if (state.wakeLock) return;
+          state.wakeLock = await navigator.wakeLock.request("screen");
+          state.wakeLock.addEventListener("release", () => {
+            state.wakeLock = null;
+          });
+        } catch (_) {
+          state.wakeLock = null;
+        }
+      }
+
+      async function maybeRequestFullscreen() {
+        if (!state.settings.fullScreen) return;
+        const root = document.documentElement;
+        if (!root.requestFullscreen || document.fullscreenElement) return;
+        try {
+          await root.requestFullscreen();
+        } catch (_) {
+          // iPhone Safari often ignores this; graceful fallback only.
+        }
+      }
+
+      function updateRotateOverlay() {
+        const landscape = window.innerWidth > window.innerHeight;
+        els.rotateOverlay.classList.toggle("visible", !landscape);
+      }
+
+      function openSettings() {
+        state.settingsOpen = true;
+        els.settingsOverlay.classList.remove("hidden");
+        buildSettingsUI();
+        settingsShell.reset();
+      }
+
+      function closeSettings() {
+        state.settingsOpen = false;
+        els.settingsOverlay.classList.add("hidden");
+        settingsShell.reset();
+        saveSettings(state.settings);
+        renderNow();
+      }
+
+      function showToast(text) {
+        let toast = document.querySelector(".transient-toast");
+        if (!toast) {
+          toast = document.createElement("div");
+          toast.className = "transient-toast";
+          document.body.appendChild(toast);
+        }
+        toast.textContent = text;
+        toast.classList.add("visible");
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => toast.classList.remove("visible"), 1050);
+      }
+
+      function publicApi() {
+        return {
+          getSettings: () => state.settings,
+          setSetting(key, value) {
+            state.settings[key] = value;
+            saveSettings(state.settings);
+            buildSettingsUI();
+            renderNow();
+          },
+          setStyleIndex(index) {
+            const design = getCurrentDesign();
+            if (!design) return;
+            const max = (design.styles && design.styles.length ? design.styles.length : 1) - 1;
+            state.settings.designStyles[design.id] = clamp(index, 0, max);
+            syncStyleSelect();
+            updateRootSummaries();
+            saveSettings(state.settings);
+            renderNow();
+          },
+          getStyleIndex: getCurrentStyleIndex,
+          closeSettings,
+          openSettings,
+          requestWakeLock: attemptWakeLockIfAllowed,
+          restartSleepTimer,
+          showToast,
+          handleRegistryChange
+        };
+      }
+
+      return {
+        init,
+        handleRegistryChange
+      };
+    }
+
+    function createSettingsShell(els, options = {}) {
+      const stack = ["root"];
+      const processedExternalPages = new Set();
+
+      function getPages() {
+        return [...document.querySelectorAll(".settings-page[data-settings-page]")];
+      }
+
+      function getPageNode(pageId) {
+        return document.querySelector(`.settings-page[data-settings-page="${cssEscape(pageId)}"]`);
+      }
+
+      function activate(pageId, push) {
+        if (push !== false && stack[stack.length - 1] !== pageId) {
+          stack.push(pageId);
+        } else if (push === false) {
+          stack.length = 0;
+          stack.push(pageId);
+        }
+
+        for (const page of getPages()) {
+          page.classList.toggle("active", page.dataset.settingsPage === pageId);
+        }
+      }
+
+      function back() {
+        if (stack.length > 1) {
+          stack.pop();
+          activate(stack[stack.length - 1], false);
+        } else {
+          activate("root", false);
+        }
+      }
+
+      function reset() {
+        activate("root", false);
+      }
+
+      function openPage(pageId) {
+        const node = getPageNode(pageId);
+        if (!node) return;
+        activate(pageId, true);
+      }
+
+      function registerSchemaPage(page) {
+        if (!page || !page.id) return;
+        if (!queuedSchemaPages.some((item) => item && item.id === page.id)) {
+          queuedSchemaPages.push(page);
+        }
+        if (options.onExternalPageOpen && !processedExternalPages.has(page.id)) {
+          processedExternalPages.add(page.id);
+          options.onExternalPageOpen(page);
+        }
+      }
+
+      els.settingsApp.addEventListener("click", (event) => {
+        const closeTarget = event.target.closest("[data-action='close-settings']");
+        if (closeTarget) {
+          options.closeSettings && options.closeSettings();
+          return;
+        }
+
+        const backTarget = event.target.closest("[data-settings-back]");
+        if (backTarget) {
+          back();
+          return;
+        }
+
+        const navTarget = event.target.closest("[data-settings-target]");
+        if (navTarget) {
+          const pageId = navTarget.getAttribute("data-settings-target");
+          openPage(pageId);
+        }
+      });
+
+      for (const page of options.queuedSchemaPages || []) {
+        registerSchemaPage(page);
+      }
+
+      return {
+        openPage,
+        back,
+        reset,
+        registerSchemaPage
+      };
+    }
+
+    function mapFieldTypeToInputType(type) {
+      switch (type) {
+        case "range":
+        case "number":
+        case "color":
+        case "text":
+          return type;
+        default:
+          return "text";
+      }
+    }
+
+    function slugify(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "item";
+    }
+
+    function cssEscape(value) {
+      return String(value).replace(/"/g, '\\"');
+    }
+
+    function escapeHtml(value) {
+      return (String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+      );
+    }
+  })();
+  </script>
+
   <script src="./designs/vanilla.js"></script>
   <script src="./designs/neon.js"></script>
   <script src="./designs/retro-sevenseg.js"></script>
+  <script src="./designs/worldmap.js"></script>
 </body>
 </html>
